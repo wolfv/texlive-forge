@@ -8,36 +8,46 @@ package:
   version: ${{ version }}
 
 build:
-  number: 2
+  number: 3
   noarch: generic
 
 requirements:
   run:
-    - texlive-standard
+    - texlive-core ==${{ version }}
   extras:
-    editor:
-      - texmaker
+    basic:
+      - texlive-basic
+    standard:
+      - texlive-standard
+    science:
+      - texlive-science
     conversion:
       - pandoc
       - ghostscript
-    desktop:
-      - texmaker
+    standard-desktop:
+      - texlive-standard
+      - texmaker >=6.0.1
+      - pandoc
+      - ghostscript
+    science-desktop:
+      - texlive-science
+      - texmaker >=6.0.1
       - pandoc
       - ghostscript
 
 tests:
   - script:
-      - pdflatex --version
-      - bibtex --version
+      - tex --version
+      - kpsewhich --version
 
 about:
   homepage: https://www.tug.org/texlive/
   license: GPL-2.0-or-later AND LPPL-1.3c
-  summary: Standard TeX Live authoring distribution
+  summary: Selectable TeX Live distribution profiles
   description: |
-    Convenience package that installs texlive-standard, including commonly
-    expected LaTeX packages, fonts, latexmk, and working PDFLaTeX and LuaLaTeX.
-    V3 extras optionally add Texmaker and document-conversion tools.
+    V3 metapackage for selecting the basic, standard, or science TeX Live
+    profile through extras. Desktop extras add Texmaker, Pandoc, and
+    Ghostscript. Without an extra it installs only the compiled TeX Live core.
 
 extra:
   recipe-maintainers:

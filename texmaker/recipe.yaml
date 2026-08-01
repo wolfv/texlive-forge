@@ -15,7 +15,7 @@ source:
     - 0001-conda-install.patch
 
 build:
-  number: 2
+  number: 3
   script:
     - if: unix
       then: build.sh
@@ -39,7 +39,7 @@ requirements:
   run:
     - menuinst >=2
     - if: not win
-      then: texlive-standard
+      then: texlive-core
 
 tests:
   - package_contents:

@@ -12,7 +12,8 @@ conda-forge recipes.
   files, recommended fonts, generated font maps and formats, and a working
   `tlmgr` package database. It provides tested `latex`, `pdflatex`, `bibtex`,
   and `lualatex` commands.
-- `texlive-standard`: the locked `scheme-small` profile (391 tlnet archives),
+- `texlive-standard`: the locked `scheme-small` profile with recommended fonts
+  (416 tlnet archives),
   including commonly expected LaTeX packages, recommended fonts, graphics,
   bibliography support, and `latexmk`.
 - `texlive-science`: the standard profile plus the TeX Live math/science and
@@ -20,12 +21,13 @@ conda-forge recipes.
   TikZ.
 - `biber`: the Unicode-aware BibLaTeX bibliography backend, packaged from TeX
   Live's self-contained Linux and universal macOS binaries.
-- `texlive`: a V3 convenience metapackage for installing `texlive-standard`.
-  Optional extras add the editor and document-conversion toolchain.
+- `texlive`: a V3 profile-selector metapackage. Extras select the basic,
+  standard, or science profile and optionally add a desktop toolchain.
 - `texmaker`: the current Qt 6 LaTeX editor for Linux and macOS,
   updated from [conda-forge/texmaker-feedstock](https://github.com/conda-forge/texmaker-feedstock).
-  It includes menuinst shortcuts and TeX file associations on both platforms;
-  Unix packages depend on this repository's functional `texlive-standard` profile.
+  It includes menuinst shortcuts and TeX file associations on both platforms.
+  It depends only on the compiled core so it can accompany any profile; install
+  it through a desktop extra to get a complete environment.
 
 ## Local build
 
@@ -44,17 +46,19 @@ pixi run build-texmaker
 
 Artifacts are written below `output/`.
 
-The V3 `texlive` metapackage can be installed minimally or with optional groups:
+Select a profile through the V3 `texlive` metapackage:
 
 ```bash
-pixi add -c https://prefix.dev/wolfv/texlive texlive
-pixi add -c https://prefix.dev/wolfv/texlive 'texlive[extras=[editor]]'
-pixi add -c https://prefix.dev/wolfv/texlive 'texlive[extras=[conversion]]'
-pixi add -c https://prefix.dev/wolfv/texlive 'texlive[extras=[desktop]]'
+pixi add -c https://prefix.dev/wolfv/texlive 'texlive[extras=[basic]]'
+pixi add -c https://prefix.dev/wolfv/texlive 'texlive[extras=[standard]]'
+pixi add -c https://prefix.dev/wolfv/texlive 'texlive[extras=[science]]'
+pixi add -c https://prefix.dev/wolfv/texlive 'texlive[extras=[standard-desktop]]'
+pixi add -c https://prefix.dev/wolfv/texlive 'texlive[extras=[science-desktop]]'
 ```
 
-The `editor` extra adds Texmaker, `conversion` adds Pandoc and Ghostscript, and
-`desktop` installs both groups.
+The desktop groups add Texmaker, Pandoc, and Ghostscript. Installing `texlive`
+without an extra installs only `texlive-core`; the profile packages can also be
+installed directly.
 
 ## Publishing to prefix.dev
 
