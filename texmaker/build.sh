@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
-cmake_args=()
+# Keep one common element: macOS runners use Bash 3.2, where expanding an
+# empty array under `set -u` raises an unbound-variable error.
+cmake_args=("-DCMAKE_POLICY_VERSION_MINIMUM=3.5")
 if [[ "$(uname)" == Linux ]]; then
   # GNU ld rejects bundled PDFium's hidden FreeType symbols when Qt also links
   # the system FreeType DSO. lld correctly keeps the hidden executable symbols
