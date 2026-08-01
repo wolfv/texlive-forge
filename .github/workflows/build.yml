@@ -24,10 +24,6 @@ jobs:
             build_core: true
             build_meta: false
             build_editor: true
-          - runner: windows-latest
-            build_core: false
-            build_meta: false
-            build_editor: true
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read

@@ -39,11 +39,6 @@ jobs:
             build_core: true
             build_meta: false
             build_editor: true
-          - runner: windows-latest
-            platform: win-64
-            build_core: false
-            build_meta: false
-            build_editor: true
     runs-on: ${{ matrix.runner }}
 
     steps:

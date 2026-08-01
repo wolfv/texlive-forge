@@ -13,9 +13,9 @@ conda-forge recipes.
   `bibtex`, and `lualatex` commands.
 - `texlive`: a convenience metapackage for installing `texlive-basic` with
   `pixi add texlive`.
-- `texmaker`: the current Qt 6 LaTeX editor for Linux, macOS, and Windows,
+- `texmaker`: the current Qt 6 LaTeX editor for Linux and macOS,
   updated from [conda-forge/texmaker-feedstock](https://github.com/conda-forge/texmaker-feedstock).
-  It includes menuinst shortcuts and TeX file associations on all platforms;
+  It includes menuinst shortcuts and TeX file associations on both platforms;
   Unix packages depend on this repository's functional `texlive-basic` package.
 
 ## Local build
@@ -34,7 +34,7 @@ Artifacts are written below `output/`.
 
 ## Publishing to prefix.dev
 
-`.github/workflows/build.yml` builds and tests Linux, macOS, and Windows on
+`.github/workflows/build.yml` builds and tests Linux and macOS on
 pushes and pull requests without publishing. `.github/workflows/release.yml`
 publishes signed packages to [`wolfv/texlive`](https://prefix.dev/wolfv/texlive)
 on a GitHub release or manual dispatch.

@@ -43,7 +43,31 @@ cp "$SRC_DIR/texmf.cnf.conda" "$texmf_dist/web2c/texmf.cnf"
 # This completes the tlmgr support proposed in conda-forge PR #78: the Perl
 # modules come from texlive.infra, while these locked tlpobj records describe
 # exactly the files owned by this scheme.
-: > "$tlpkg/texlive.tlpdb"
+cat > "$tlpkg/texlive.tlpdb" <<'TLPDB'
+name 00texlive.config
+category TLCore
+revision 79836
+depend container_format/xz
+depend container_split_doc_files/1
+depend container_split_src_files/1
+depend frozen/0
+depend minrelease/2026
+depend release/2026
+
+name 00texlive.installation
+category TLCore
+revision 79836
+depend opt_autobackup:1
+depend opt_backupdir:tlpkg/backups
+depend opt_create_formats:1
+depend opt_generate_updmap:0
+depend opt_install_docfiles:0
+depend opt_install_srcfiles:0
+depend opt_location:https://ftp.fau.de/ctan/systems/texlive/tlnet
+depend opt_post_code:1
+depend setting_available_architectures:aarch64-linux universal-darwin x86_64-darwinlegacy x86_64-linux
+
+TLPDB
 while IFS= read -r tlpobj; do
   cat "$tlpobj" >> "$tlpkg/texlive.tlpdb"
   printf '\n' >> "$tlpkg/texlive.tlpdb"
