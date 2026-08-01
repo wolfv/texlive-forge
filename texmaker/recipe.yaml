@@ -15,7 +15,7 @@ source:
     - 0001-conda-install.patch
 
 build:
-  number: 0
+  number: 1
   script:
     - if: unix
       then: build.sh
@@ -34,7 +34,8 @@ requirements:
   host:
     - qt6-main >=6.5
     - qt6-webengine >=6.5
-    - vulkan-headers
+    - if: linux
+      then: vulkan-headers
   run:
     - menuinst >=2
     - if: not win
