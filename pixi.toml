@@ -1,4 +1,4 @@
-[project]
+[workspace]
 name = "texlive-forge"
 version = "0.1.0"
 description = "Rattler-build recipes for TeX Live and a Qt-based editor"
