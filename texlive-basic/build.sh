@@ -86,6 +86,29 @@ printf '}\n' >> "$config_dir/language.dat.lua"
 
 mktexlsr
 
+# The release-wide updmap.cfg from texlive-core references every TeX Live font
+# package, including collections not installed here. Keep only map files that
+# are actually present, then generate the pdfTeX/dvips maps in TEXMFSYSVAR.
+python - "$texmf_dist/web2c/updmap.cfg" <<'PY'
+import pathlib
+import re
+import subprocess
+import sys
+
+config = pathlib.Path(sys.argv[1])
+result = []
+for line in config.read_text().splitlines():
+    match = re.match(r"^(Map|MixedMap|KanjiMap)\s+(\S+)", line)
+    if match and subprocess.run(
+        ["kpsewhich", match.group(2)], capture_output=True, check=False
+    ).returncode != 0:
+        line = "#! " + line
+    result.append(line)
+config.write_text("\n".join(result) + "\n")
+PY
+updmap-sys --nohash
+mktexlsr
+
 # texlive-core supplies engines; the scheme supplies initialization files.
 # Generate the principal formats now so every installed environment works
 # immediately and does not write format files into a user's home directory.

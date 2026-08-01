@@ -62,10 +62,12 @@ def package_hash(name: str) -> tuple[str, str]:
     return name, hashlib.sha256(fetch(url)).hexdigest()
 
 
-def generate(root_package: str, output: pathlib.Path) -> None:
+def generate(root_packages: list[str], output: pathlib.Path) -> None:
     tlpdb_raw = fetch(f"{TLNET}/tlpkg/texlive.tlpdb")
     records = parse_tlpdb(tlpdb_raw)
-    packages = dependency_closure(records, root_package)
+    packages = sorted(
+        set().union(*(dependency_closure(records, root) for root in root_packages))
+    )
 
     # Date the generated package after the repository snapshot and retain every
     # upstream revision in the lock file for reviewability.
@@ -107,10 +109,12 @@ source:
 {chr(10).join(source_lines)}
 
 build:
-  number: 0
+  number: 2
   script: build.sh
 
 requirements:
+  build:
+    - python
   host:
     - texlive-core ==${{{{ texlive_version }}}}
   run:
@@ -118,26 +122,33 @@ requirements:
 
  tests:
   - script:
+      - export LANG=C
+      - export LC_ALL=C
       - lualatex --version
       - pdflatex --version
       - tlmgr info --only-installed scheme-basic
+      - tlmgr info --only-installed collection-fontsrecommended
       - echo "\\\\documentclass{{article}}\\\\begin{{document}}LuaLaTeX works.\\\\end{{document}}" > smoke.tex
       - lualatex -interaction=nonstopmode -halt-on-error smoke.tex
       - test -s smoke.pdf
+      - echo "\\\\documentclass{{article}}\\\\usepackage{{times}}\\\\begin{{document}}Times and \\\\texttt{{Courier}}.\\\\end{{document}}" > fonts.tex
+      - pdflatex -interaction=nonstopmode -halt-on-error fonts.tex
+      - test -s fonts.pdf
 
 about:
   homepage: https://www.tug.org/texlive/
   license: GPL-2.0-or-later AND LPPL-1.3c AND OFL-1.1
-  summary: TeX Live basic scheme with working LaTeX and LuaLaTeX formats
+  summary: TeX Live basic scheme with recommended fonts
   description: |
-    The transitive contents of TeX Live's scheme-basic, locked from the tlnet
-    package database. It adds the macro files, fonts, configuration, and formats
-    needed for a functional basic TeX installation to texlive-core.
+    The transitive contents of TeX Live's scheme-basic and recommended font
+    collection, locked from the tlnet package database. It adds the macro files,
+    fonts, configuration, and formats needed for a functional TeX installation
+    to texlive-core.
 
 extra:
   recipe-maintainers:
     - wolfv
-  texlive-root-package: {root_package}
+  texlive-root-packages: {' '.join(root_packages)}
 '''
     # Keep generated YAML syntactically aligned despite the readable template.
     recipe = recipe.replace("\n tests:\n", "\ntests:\n")
@@ -147,7 +158,11 @@ extra:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--root", default="scheme-basic")
+    parser.add_argument(
+        "--root",
+        nargs="+",
+        default=["scheme-basic", "collection-fontsrecommended"],
+    )
     parser.add_argument("--output", type=pathlib.Path, default=ROOT / "texlive-basic")
     args = parser.parse_args()
     generate(args.root, args.output)
