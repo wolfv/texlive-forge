@@ -1269,8 +1269,11 @@ requirements:
     - texlive-core ==${{ texlive_version }}
   run:
     - texlive-core ==${{ texlive_version }}
+    - biber
+    - chktex
   run_constraints:
     - texlive-basic <0a0
+    - texlive-science <0a0
 
 tests:
   - script:
@@ -1293,6 +1296,10 @@ tests:
       - echo "\\documentclass{article}\\begin{document}XeLaTeX works.\\end{document}" > xetex.tex
       - xelatex -interaction=nonstopmode -halt-on-error xetex.tex
       - test -s xetex.pdf
+      - echo "@book{lamport,author={Leslie Lamport},title={LaTeX},year={1994},publisher={Addison-Wesley}}" > refs.bib
+      - echo "\\documentclass{article}\\usepackage[backend=biber]{biblatex}\\addbibresource{refs.bib}\\begin{document}\\cite{lamport}\\printbibliography\\end{document}" > bibliography.tex
+      - latexmk -pdf -interaction=nonstopmode -halt-on-error bibliography.tex
+      - test -s bibliography.pdf
 
 about:
   homepage: https://www.tug.org/texlive/

@@ -1,0 +1,47 @@
+schema_version: 1
+
+context:
+  version: "2.21"
+
+package:
+  name: biber
+  version: ${{ version }}
+
+source:
+  - if: linux
+    then:
+      url: https://ftp.fau.de/ctan/systems/texlive/tlnet/archive/biber.x86_64-linux.tar.xz
+      sha256: cf924a4fa0048f3c190ddc9ea03f96d6dfc9c4024194d0bf64b33cfcafa77780
+  - if: osx
+    then:
+      url: https://ftp.fau.de/ctan/systems/texlive/tlnet/archive/biber.universal-darwin.tar.xz
+      sha256: b701db40844f165e0b76ddcdbf869b8de41a5efe17d2164f85d1589185f82b21
+
+build:
+  number: 0
+  skip: win
+  script: build.sh
+
+requirements:
+  run:
+    - if: linux
+      then: libxcrypt1
+
+tests:
+  - script:
+      - biber --version
+      - biber --help
+
+about:
+  homepage: https://biblatex-biber.sourceforge.net/
+  license: Artistic-2.0
+  license_file: LICENSE
+  summary: Bibliography processor for BibLaTeX
+  description: |
+    Biber is a Unicode-aware bibliography processor and BibTeX replacement
+    designed for use with the BibLaTeX package.
+
+extra:
+  recipe-maintainers:
+    - wolfv
+  upstream-source: TeX Live binary distribution

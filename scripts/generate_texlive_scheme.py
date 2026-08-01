@@ -81,7 +81,7 @@ def test_commands(kind: str) -> list[str]:
     ]
     if kind == "basic":
         commands.insert(5, "tlmgr info --only-installed collection-fontsrecommended")
-    elif kind == "standard":
+    elif kind in {"standard", "science"}:
         commands.insert(5, "tlmgr info --only-installed scheme-small")
         commands.extend(
             [
@@ -92,8 +92,20 @@ def test_commands(kind: str) -> list[str]:
                 'echo "\\\\documentclass{article}\\\\begin{document}XeLaTeX works.\\\\end{document}" > xetex.tex',
                 "xelatex -interaction=nonstopmode -halt-on-error xetex.tex",
                 "test -s xetex.pdf",
+                'echo "@book{lamport,author={Leslie Lamport},title={LaTeX},year={1994},publisher={Addison-Wesley}}" > refs.bib',
+                'echo "\\\\documentclass{article}\\\\usepackage[backend=biber]{biblatex}\\\\addbibresource{refs.bib}\\\\begin{document}\\\\cite{lamport}\\\\printbibliography\\\\end{document}" > bibliography.tex',
+                "latexmk -pdf -interaction=nonstopmode -halt-on-error bibliography.tex",
+                "test -s bibliography.pdf",
             ]
         )
+        if kind == "science":
+            commands.extend(
+                [
+                    'echo "\\\\documentclass{article}\\\\usepackage{mathtools,siunitx,tikz,mhchem}\\\\begin{document}\\\\ce{H2O}, \\\\qty{1}{\\\\meter}. \\\\begin{tikzpicture}\\\\draw (0,0)--(1,1);\\\\end{tikzpicture}\\\\end{document}" > science.tex',
+                    "pdflatex -interaction=nonstopmode -halt-on-error science.tex",
+                    "test -s science.pdf",
+                ]
+            )
     else:
         raise ValueError(f"unknown test kind: {kind}")
     return commands
@@ -132,6 +144,9 @@ def generate(profile_name: str, profile: dict[str, Any], output: pathlib.Path) -
             ]
         )
 
+    run_dependencies = "".join(
+        f"    - {name}\n" for name in profile.get("run_dependencies", [])
+    )
     constraints = ""
     if profile.get("conflicts"):
         constraints = "  run_constraints:\n" + "".join(
@@ -163,7 +178,7 @@ requirements:
     - texlive-core ==${{{{ texlive_version }}}}
   run:
     - texlive-core ==${{{{ texlive_version }}}}
-{constraints}
+{run_dependencies}{constraints}
 tests:
   - script:
 {yaml_script(test_commands(profile["test_kind"]))}
@@ -186,12 +201,12 @@ extra:
 
 
 def main() -> None:
+    profiles = tomllib.loads(PROFILES.read_text())["profiles"]
     parser = argparse.ArgumentParser()
-    parser.add_argument("--profile", choices=("basic", "standard"), default="basic")
+    parser.add_argument("--profile", choices=tuple(profiles), default="basic")
     parser.add_argument("--output", type=pathlib.Path)
     args = parser.parse_args()
 
-    profiles = tomllib.loads(PROFILES.read_text())["profiles"]
     profile = profiles[args.profile]
     output = args.output or ROOT / profile["package"]
     generate(args.profile, profile, output)

@@ -15,6 +15,11 @@ conda-forge recipes.
 - `texlive-standard`: the locked `scheme-small` profile (391 tlnet archives),
   including commonly expected LaTeX packages, recommended fonts, graphics,
   bibliography support, and `latexmk`.
+- `texlive-science`: the standard profile plus the TeX Live math/science and
+  graphics collections, including Mathtools, SIunitx, chemistry packages, and
+  TikZ.
+- `biber`: the Unicode-aware BibLaTeX bibliography backend, packaged from TeX
+  Live's self-contained Linux and universal macOS binaries.
 - `texlive`: a convenience metapackage for installing `texlive-standard` with
   `pixi add texlive`.
 - `texmaker`: the current Qt 6 LaTeX editor for Linux and macOS,
@@ -29,7 +34,9 @@ Install [pixi](https://pixi.sh), then run:
 ```bash
 pixi run build-core
 pixi run build-basic
+pixi run build-biber
 pixi run build-standard
+pixi run build-science
 pixi run build-texlive
 # On Unix, the TeX packages must finish before the editor.
 pixi run build-texmaker

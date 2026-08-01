@@ -470,6 +470,7 @@ requirements:
     - texlive-core ==${{ texlive_version }}
   run_constraints:
     - texlive-standard <0a0
+    - texlive-science <0a0
 
 tests:
   - script:

@@ -33,7 +33,7 @@ This model remains declarative and avoids unmanaged changes to conda prefixes.
 |---|---|---|---|
 | `texlive-basic` | `scheme-basic` plus `collection-fontsrecommended` | Small functional LaTeX/LuaLaTeX installation | Available |
 | `texlive-standard` | `scheme-small`, with bibliography, graphics, tables, hyperlinks, recommended fonts, and latexmk | Default desktop and CI installation | Implemented; CI pending |
-| `texlive-science` | Standard profile plus `collection-mathscience`, `collection-pictures`, and common publishing packages | Scientific papers and reports | P1 |
+| `texlive-science` | Standard profile plus `collection-mathscience` and `collection-pictures` | Scientific papers and reports | Implemented; CI pending |
 | `texlive-publishing` | Science profile plus bibliography, glossary, indexing, and publisher-oriented collections | Larger authoring environment | P2 |
 | `texlive-full` | Upstream `scheme-full`, subject to artifact-size and CI-time evaluation | Compatibility fallback | P3 |
 
@@ -43,8 +43,8 @@ The `texlive` metapackage should move from `texlive-basic` to
 ### Standalone command-line tools
 
 1. `latexmk` — default multi-pass document builder.
-2. `biber` — modern BibLaTeX backend.
-3. `chktex` — LaTeX linter.
+2. `biber` — modern BibLaTeX backend. **Implemented; CI pending.**
+3. `chktex` — reuse the current conda-forge package.
 4. `tectonic` — optional alternative engine with its own bundle model.
 5. `ghostscript` — use conda-forge where possible rather than rebuilding it.
 6. `pandoc` integration tests — consume conda-forge's package.
@@ -116,6 +116,6 @@ prefix.
    end-to-end tests using representative documents.
 3. Decide whether the `latexmk` copy in `scheme-small` is sufficient or merits
    a separately versioned conda package.
-4. Start the science profile and package Biber and ChkTeX.
+4. Prepare the publishing profile and evaluate Texstudio packaging.
 5. Verify Texmaker's quick-build configuration against `latexmk` from the same
    prefix.

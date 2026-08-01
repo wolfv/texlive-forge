@@ -8,7 +8,7 @@ The transitive contents of TeX Live's scheme-basic and recommended font
 collection, locked from the tlnet package database. It provides a compact,
 functional LaTeX, PDFLaTeX, and LuaLaTeX installation.
 """
-conflicts = ["texlive-standard"]
+conflicts = ["texlive-standard", "texlive-science"]
 test_kind = "basic"
 
 [profiles.standard]
@@ -21,5 +21,25 @@ A locked build of TeX Live's scheme-small, with commonly expected LaTeX
 packages, recommended fonts, graphics and bibliography support, and latexmk.
 It is intended as the default interactive and CI authoring environment.
 """
-conflicts = ["texlive-basic"]
+conflicts = ["texlive-basic", "texlive-science"]
+run_dependencies = ["biber", "chktex"]
 test_kind = "standard"
+
+[profiles.science]
+package = "texlive-science"
+build_number = 0
+roots = [
+  "scheme-small",
+  "collection-fontsrecommended",
+  "collection-mathscience",
+  "collection-pictures",
+]
+summary = "TeX Live scientific authoring distribution"
+description = """
+A locked TeX Live profile for scientific papers and reports. It combines the
+standard profile with the math/science and graphics collections, including
+AMS packages, Mathtools, SIunitx, chemistry packages, and TikZ.
+"""
+conflicts = ["texlive-basic", "texlive-standard"]
+run_dependencies = ["biber", "chktex"]
+test_kind = "science"
