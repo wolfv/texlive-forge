@@ -51,3 +51,16 @@
  endif()
  ############## TRANSLATIONS ###################
  file(GLOB ts_files translations/texmaker/*.ts)
+--- a/3rdparty/pdfium/third_party/zlib_v128/zutil.h
++++ b/3rdparty/pdfium/third_party/zlib_v128/zutil.h
+@@ -118,7 +118,9 @@
+ #  endif
+ #endif
+ 
+-#if defined(MACOS) || defined(TARGET_OS_MAC)
++/* MACOS denotes classic Mac OS here. Modern macOS also defines
++ * TARGET_OS_MAC, but is a Unix platform and provides fdopen(). */
++#if defined(MACOS)
+ #  define OS_CODE  0x07
+ #  ifndef Z_SOLO
+ #    if defined(__MWERKS__) && __dest_os != __be_os && __dest_os != __win32_os
