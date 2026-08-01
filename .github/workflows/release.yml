@@ -1,0 +1,90 @@
+name: Release to prefix.dev
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      overwrite:
+        description: Overwrite packages that already exist in the channel
+        type: boolean
+        default: false
+
+concurrency:
+  group: texlive-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish:
+    name: ${{ matrix.platform }}
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux-64
+            build_core: true
+            build_meta: true
+            build_editor: true
+          - runner: macos-13
+            platform: osx-64
+            build_core: true
+            build_meta: false
+            build_editor: true
+          - runner: macos-14
+            platform: osx-arm64
+            build_core: true
+            build_meta: false
+            build_editor: true
+          - runner: windows-latest
+            platform: win-64
+            build_core: false
+            build_meta: false
+            build_editor: true
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: prefix-dev/setup-pixi@v0.9.6
+        with:
+          pixi-version: latest
+          cache: true
+
+      - name: Build texlive-core
+        if: matrix.build_core
+        run: pixi run build-core
+
+      - name: Build the basic TeX scheme
+        if: matrix.build_core
+        run: pixi run build-basic
+
+      - name: Build texlive convenience package
+        if: matrix.build_meta
+        run: pixi run build-texlive
+
+      - name: Build Texmaker
+        if: matrix.build_editor
+        run: pixi run build-texmaker
+
+      - name: Publish with trusted publishing
+        env:
+          OVERWRITE: ${{ inputs.overwrite || false }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$OVERWRITE" = "true" ]; then
+            duplicate=(--force)
+          else
+            duplicate=(--skip-existing)
+          fi
+          while IFS= read -r package; do
+            pixi run rattler-build upload prefix \
+              --channel wolfv/texlive \
+              --generate-attestation \
+              "${duplicate[@]}" \
+              "$package"
+          done < <(find output -type f -name '*.conda' | sort)

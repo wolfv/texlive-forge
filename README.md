@@ -1,0 +1,62 @@
+# texlive-forge
+
+Rattler-build recipes for an easy-to-install TeX distribution, derived from
+conda-forge recipes.
+
+## Packages
+
+- `texlive-core`: TeX Live's compiled engines and command-line tools. The
+  recipe tracks [conda-forge/texlive-core-feedstock](https://github.com/conda-forge/texlive-core-feedstock).
+- `texlive-basic`: the locked transitive closure of upstream `scheme-basic`
+  (118 tlnet archives), including macro files, fonts, generated formats, and a
+  working `tlmgr` package database. It provides tested `latex`, `pdflatex`,
+  `bibtex`, and `lualatex` commands.
+- `texlive`: a convenience metapackage for installing `texlive-basic` with
+  `pixi add texlive`.
+- `texmaker`: the current Qt 6 LaTeX editor for Linux, macOS, and Windows,
+  updated from [conda-forge/texmaker-feedstock](https://github.com/conda-forge/texmaker-feedstock).
+  It includes menuinst shortcuts and TeX file associations on all platforms;
+  Unix packages depend on this repository's functional `texlive-basic` package.
+
+## Local build
+
+Install [pixi](https://pixi.sh), then run:
+
+```bash
+pixi run build-core
+pixi run build-basic
+pixi run build-texlive
+# On Unix, the TeX packages must finish before the editor.
+pixi run build-texmaker
+```
+
+Artifacts are written below `output/`.
+
+## Publishing to prefix.dev
+
+`.github/workflows/build.yml` builds and tests Linux, macOS, and Windows on
+pushes and pull requests without publishing. `.github/workflows/release.yml`
+publishes signed packages to [`wolfv/texlive`](https://prefix.dev/wolfv/texlive)
+on a GitHub release or manual dispatch.
+
+Publishing uses GitHub OIDC trusted publishing, so no API-key secret is needed.
+Configure the channel's trusted publisher with:
+
+```text
+repository: wolfv/texlive-forge
+workflow:   release.yml
+```
+
+## Scope
+
+`texlive-basic` is intentionally much smaller than full TeX Live. Its recipe
+is generated from TeX Live's dependency metadata and locks every source
+archive by SHA-256. To refresh it from the current tlnet snapshot, run:
+
+```bash
+python scripts/generate_texlive_scheme.py
+```
+
+The same generator can produce larger schemes or collections, allowing us to
+add recommended LaTeX packages, science packages, languages, and fonts without
+forcing every installation to download the multi-gigabyte full distribution.

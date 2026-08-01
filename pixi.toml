@@ -1,0 +1,18 @@
+[project]
+name = "texlive-forge"
+version = "0.1.0"
+description = "Rattler-build recipes for TeX Live and a Qt-based editor"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[dependencies]
+rattler-build = ">=0.71,<0.72"
+python = ">=3.11"
+
+[tasks]
+render = "rattler-build build --render-only --with-solve --recipe-dir ."
+generate-basic = "python scripts/generate_texlive_scheme.py"
+build-core = "rattler-build build --recipe texlive-core"
+build-basic = "rattler-build build --recipe texlive-basic --channel output --channel conda-forge"
+build-texlive = "rattler-build build --recipe texlive --channel output --channel conda-forge"
+build-texmaker = "rattler-build build --recipe texmaker --channel output --channel conda-forge"

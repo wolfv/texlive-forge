@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://schemas.conda.io/menuinst-1.schema.json",
+  "menu_name": "TeX Live",
+  "menu_items": [
+    {
+      "name": {
+        "target_environment_is_base": "Texmaker",
+        "target_environment_is_not_base": "Texmaker ({{ ENV_NAME }})"
+      },
+      "description": "Cross-platform LaTeX editor",
+      "icon": "{{ MENU_DIR }}/texmaker.{{ ICON_EXT }}",
+      "activate": true,
+      "terminal": false,
+      "command": [""],
+      "platforms": {
+        "linux": {
+          "command": ["{{ PREFIX }}/bin/texmaker", "%F"],
+          "Categories": ["Office", "Publishing", "Science"],
+          "MimeType": ["text/x-tex"],
+          "glob_patterns": {"text/x-tex": "*.tex"}
+        },
+        "osx": {
+          "command": ["{{ PREFIX }}/texmaker.app/Contents/MacOS/texmaker", "$@"],
+          "CFBundleName": "Texmaker",
+          "CFBundleIdentifier": "net.xm1math.texmaker",
+          "CFBundleVersion": "6.0.1",
+          "CFBundleDocumentTypes": [
+            {
+              "CFBundleTypeName": "TeX document",
+              "CFBundleTypeRole": "Editor",
+              "LSHandlerRank": "Alternate",
+              "LSItemContentTypes": ["org.tug.tex"]
+            }
+          ]
+        },
+        "win": {
+          "desktop": true,
+          "app_user_model_id": "net.xm1math.texmaker",
+          "command": ["{{ PREFIX }}/Library/bin/texmaker.exe", "%*"],
+          "file_extensions": [".tex", ".bib", ".sty", ".cls"]
+        }
+      }
+    }
+  ]
+}

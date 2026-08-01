@@ -1,0 +1,33 @@
+schema_version: 1
+
+context:
+  version: "20260301"
+
+package:
+  name: texlive
+  version: ${{ version }}
+
+build:
+  number: 0
+  noarch: generic
+
+requirements:
+  run:
+    - texlive-basic
+
+tests:
+  - script:
+      - pdflatex --version
+      - bibtex --version
+
+about:
+  homepage: https://www.tug.org/texlive/
+  license: GPL-2.0-or-later AND LPPL-1.3c
+  summary: Basic TeX Live distribution with LaTeX and LuaLaTeX
+  description: |
+    Convenience package that installs texlive-basic, including working latex,
+    pdflatex, bibtex, and lualatex commands.
+
+extra:
+  recipe-maintainers:
+    - wolfv

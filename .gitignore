@@ -1,0 +1,4 @@
+.pixi/
+output/
+*.log
+.DS_Store

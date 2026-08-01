@@ -1,0 +1,70 @@
+schema_version: 1
+
+context:
+  name: texmaker
+  version: "6.0.1"
+
+package:
+  name: ${{ name }}
+  version: ${{ version }}
+
+source:
+  url: https://www.xm1math.net/texmaker/texmaker-${{ version }}.tar.bz2
+  sha256: b8c235df0cd8fd7714cd70d3b5ee363163b0254a9dea9180781b8f0e2e46caf6
+  patches:
+    - 0001-conda-install.patch
+
+build:
+  number: 0
+  script:
+    - if: unix
+      then: build.sh
+    - if: win
+      then: bld.bat
+
+requirements:
+  build:
+    - ${{ compiler('c') }}
+    - ${{ compiler('cxx') }}
+    - ${{ stdlib('c') }}
+    - cmake
+    - ninja
+  host:
+    - qt6-main >=6.5
+    - qt6-webengine >=6.5
+  run:
+    - menuinst >=2
+    - if: not win
+      then: texlive-basic
+
+tests:
+  - package_contents:
+      files:
+        - if: linux
+          then: bin/texmaker
+        - if: osx
+          then: texmaker.app/Contents/MacOS/texmaker
+        - if: win
+          then: Library/bin/texmaker.exe
+        - Menu/texmaker.json
+        - if: linux
+          then: Menu/texmaker.png
+        - if: osx
+          then: Menu/texmaker.icns
+        - if: win
+          then: Menu/texmaker.ico
+
+about:
+  homepage: https://www.xm1math.net/texmaker/
+  license: GPL-2.0-only
+  license_file: COPYING
+  summary: Free cross-platform LaTeX editor
+  description: |
+    Texmaker is a free, modern, cross-platform LaTeX editor with an integrated
+    PDF viewer. A menuinst definition provides native application shortcuts and
+    TeX file associations on Linux, macOS, and Windows.
+
+extra:
+  recipe-maintainers:
+    - wolfv
+  upstream-feedstock: https://github.com/conda-forge/texmaker-feedstock
