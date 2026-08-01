@@ -365,7 +365,7 @@ source:
     target_directory: packages/zapfding
 
 build:
-  number: 0
+  number: 1
   script: build.sh
 
 requirements:
@@ -376,6 +376,10 @@ requirements:
 
 tests:
   - script:
+      # macOS does not provide the C.UTF-8 locale used by rattler-build's
+      # default test environment, and LuaHBTeX exits if that locale is absent.
+      - export LANG=C
+      - export LC_ALL=C
       - lualatex --version
       - pdflatex --version
       - tlmgr info --only-installed scheme-basic
