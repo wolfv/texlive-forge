@@ -8,9 +8,10 @@ conda-forge recipes.
 - `texlive-core`: TeX Live's compiled engines and command-line tools. The
   recipe tracks [conda-forge/texlive-core-feedstock](https://github.com/conda-forge/texlive-core-feedstock).
 - `texlive-basic`: the locked transitive closure of upstream `scheme-basic`
-  (118 tlnet archives), including macro files, fonts, generated formats, and a
-  working `tlmgr` package database. It provides tested `latex`, `pdflatex`,
-  `bibtex`, and `lualatex` commands.
+  and `collection-fontsrecommended` (149 tlnet archives), including macro
+  files, recommended fonts, generated font maps and formats, and a working
+  `tlmgr` package database. It provides tested `latex`, `pdflatex`, `bibtex`,
+  and `lualatex` commands.
 - `texlive`: a convenience metapackage for installing `texlive-basic` with
   `pixi add texlive`.
 - `texmaker`: the current Qt 6 LaTeX editor for Linux and macOS,
@@ -57,6 +58,7 @@ archive by SHA-256. To refresh it from the current tlnet snapshot, run:
 python scripts/generate_texlive_scheme.py
 ```
 
-The same generator can produce larger schemes or collections, allowing us to
-add recommended LaTeX packages, science packages, languages, and fonts without
-forcing every installation to download the multi-gigabyte full distribution.
+The same generator can produce larger schemes or collections without forcing
+all installations to download the multi-gigabyte full distribution. See
+[`ROADMAP.md`](ROADMAP.md) for the planned standard, science, and publishing
+profiles and additional tools and editors.
