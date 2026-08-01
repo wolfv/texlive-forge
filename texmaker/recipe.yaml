@@ -29,9 +29,12 @@ requirements:
     - ${{ stdlib('c') }}
     - cmake
     - ninja
+    - if: linux
+      then: lld
   host:
     - qt6-main >=6.5
     - qt6-webengine >=6.5
+    - vulkan-headers
   run:
     - menuinst >=2
     - if: not win
