@@ -19,5 +19,5 @@ build-basic = "rattler-build build --recipe texlive-basic --skip-existing all --
 build-biber = "rattler-build build --recipe biber --skip-existing all --channel https://prefix.dev/wolfv/texlive --channel conda-forge"
 build-standard = "rattler-build build --recipe texlive-standard --skip-existing all --channel https://prefix.dev/wolfv/texlive --channel conda-forge"
 build-science = "rattler-build build --recipe texlive-science --skip-existing all --channel https://prefix.dev/wolfv/texlive --channel conda-forge"
-build-texlive = "rattler-build build --recipe texlive --skip-existing all --channel https://prefix.dev/wolfv/texlive --channel conda-forge"
+build-texlive = "rattler-build build --v3 --recipe texlive --skip-existing all --channel https://prefix.dev/wolfv/texlive --channel conda-forge"
 build-texmaker = "rattler-build build --recipe texmaker --skip-existing all --channel https://prefix.dev/wolfv/texlive --channel conda-forge"

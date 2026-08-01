@@ -20,8 +20,8 @@ conda-forge recipes.
   TikZ.
 - `biber`: the Unicode-aware BibLaTeX bibliography backend, packaged from TeX
   Live's self-contained Linux and universal macOS binaries.
-- `texlive`: a convenience metapackage for installing `texlive-standard` with
-  `pixi add texlive`.
+- `texlive`: a V3 convenience metapackage for installing `texlive-standard`.
+  Optional extras add the editor and document-conversion toolchain.
 - `texmaker`: the current Qt 6 LaTeX editor for Linux and macOS,
   updated from [conda-forge/texmaker-feedstock](https://github.com/conda-forge/texmaker-feedstock).
   It includes menuinst shortcuts and TeX file associations on both platforms;
@@ -43,6 +43,18 @@ pixi run build-texmaker
 ```
 
 Artifacts are written below `output/`.
+
+The V3 `texlive` metapackage can be installed minimally or with optional groups:
+
+```bash
+pixi add -c https://prefix.dev/wolfv/texlive texlive
+pixi add -c https://prefix.dev/wolfv/texlive 'texlive[extras=[editor]]'
+pixi add -c https://prefix.dev/wolfv/texlive 'texlive[extras=[conversion]]'
+pixi add -c https://prefix.dev/wolfv/texlive 'texlive[extras=[desktop]]'
+```
+
+The `editor` extra adds Texmaker, `conversion` adds Pandoc and Ghostscript, and
+`desktop` installs both groups.
 
 ## Publishing to prefix.dev
 

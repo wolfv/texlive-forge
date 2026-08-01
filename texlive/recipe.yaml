@@ -8,12 +8,22 @@ package:
   version: ${{ version }}
 
 build:
-  number: 1
+  number: 2
   noarch: generic
 
 requirements:
   run:
     - texlive-standard
+  extras:
+    editor:
+      - texmaker
+    conversion:
+      - pandoc
+      - ghostscript
+    desktop:
+      - texmaker
+      - pandoc
+      - ghostscript
 
 tests:
   - script:
@@ -27,6 +37,7 @@ about:
   description: |
     Convenience package that installs texlive-standard, including commonly
     expected LaTeX packages, fonts, latexmk, and working PDFLaTeX and LuaLaTeX.
+    V3 extras optionally add Texmaker and document-conversion tools.
 
 extra:
   recipe-maintainers:
