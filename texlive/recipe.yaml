@@ -8,12 +8,12 @@ package:
   version: ${{ version }}
 
 build:
-  number: 0
+  number: 1
   noarch: generic
 
 requirements:
   run:
-    - texlive-basic
+    - texlive-standard
 
 tests:
   - script:
@@ -23,10 +23,10 @@ tests:
 about:
   homepage: https://www.tug.org/texlive/
   license: GPL-2.0-or-later AND LPPL-1.3c
-  summary: Basic TeX Live distribution with LaTeX and LuaLaTeX
+  summary: Standard TeX Live authoring distribution
   description: |
-    Convenience package that installs texlive-basic, including working latex,
-    pdflatex, bibtex, and lualatex commands.
+    Convenience package that installs texlive-standard, including commonly
+    expected LaTeX packages, fonts, latexmk, and working PDFLaTeX and LuaLaTeX.
 
 extra:
   recipe-maintainers:

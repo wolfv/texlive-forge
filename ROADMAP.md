@@ -32,7 +32,7 @@ This model remains declarative and avoids unmanaged changes to conda prefixes.
 | Package | Intended contents | Use case | Priority |
 |---|---|---|---|
 | `texlive-basic` | `scheme-basic` plus `collection-fontsrecommended` | Small functional LaTeX/LuaLaTeX installation | Available |
-| `texlive-standard` | Start from `scheme-small`; add commonly expected bibliography, graphics, tables, hyperlinks, and recommended fonts | Default desktop and CI installation | P0 |
+| `texlive-standard` | `scheme-small`, with bibliography, graphics, tables, hyperlinks, recommended fonts, and latexmk | Default desktop and CI installation | Implemented; CI pending |
 | `texlive-science` | Standard profile plus `collection-mathscience`, `collection-pictures`, and common publishing packages | Scientific papers and reports | P1 |
 | `texlive-publishing` | Science profile plus bibliography, glossary, indexing, and publisher-oriented collections | Larger authoring environment | P2 |
 | `texlive-full` | Upstream `scheme-full`, subject to artifact-size and CI-time evaluation | Compatibility fallback | P3 |
@@ -110,11 +110,12 @@ prefix.
 
 ## Immediate next work
 
-1. Finish publishing the corrected `texlive-basic` with recommended fonts and
-   generated maps.
-2. Refactor the generator around profile manifests without changing the basic
-   package's contents.
-3. Generate and inspect the `scheme-small` closure for `texlive-standard`.
-4. Package `latexmk` and add a representative multi-pass sample document.
-5. Switch the `texlive` and editor dependencies to `texlive-standard` after CI
-   is green on all three Unix platforms.
+1. Validate and publish `texlive-basic` and `texlive-standard` on all three
+   Unix platforms.
+2. Measure the standard profile's installed and compressed sizes and refine its
+   end-to-end tests using representative documents.
+3. Decide whether the `latexmk` copy in `scheme-small` is sufficient or merits
+   a separately versioned conda package.
+4. Start the science profile and package Biber and ChkTeX.
+5. Verify Texmaker's quick-build configuration against `latexmk` from the same
+   prefix.

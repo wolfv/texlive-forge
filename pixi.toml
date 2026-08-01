@@ -11,8 +11,10 @@ python = ">=3.11"
 
 [tasks]
 render = "rattler-build build --render-only --with-solve --recipe-dir ."
-generate-basic = "python scripts/generate_texlive_scheme.py"
+generate-basic = "python scripts/generate_texlive_scheme.py --profile basic"
+generate-standard = "python scripts/generate_texlive_scheme.py --profile standard"
 build-core = "rattler-build build --recipe texlive-core"
 build-basic = "rattler-build build --recipe texlive-basic --channel conda-forge"
+build-standard = "rattler-build build --recipe texlive-standard --channel conda-forge"
 build-texlive = "rattler-build build --recipe texlive --channel conda-forge"
 build-texmaker = "rattler-build build --recipe texmaker --channel conda-forge"

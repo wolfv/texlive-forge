@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate a locked rattler-build recipe from TeX Live's rolling tlpdb."""
+"""Generate locked rattler-build recipes for configured TeX Live profiles."""
 
 from __future__ import annotations
 
@@ -8,14 +8,17 @@ import concurrent.futures
 import datetime as dt
 import hashlib
 import pathlib
+import tomllib
 import urllib.request
 from collections import defaultdict
+from typing import Any
 
 # Use one well-maintained mirror so the database and all archives come from the
 # same repository snapshot. mirror.ctan.org may redirect concurrent requests to
 # different, temporarily out-of-sync mirrors.
 TLNET = "https://ftp.fau.de/ctan/systems/texlive/tlnet"
 ROOT = pathlib.Path(__file__).resolve().parents[1]
+PROFILES = ROOT / "texlive-profiles.toml"
 
 
 def fetch(url: str) -> bytes:
@@ -62,22 +65,56 @@ def package_hash(name: str) -> tuple[str, str]:
     return name, hashlib.sha256(fetch(url)).hexdigest()
 
 
-def generate(root_packages: list[str], output: pathlib.Path) -> None:
+def test_commands(kind: str) -> list[str]:
+    commands = [
+        "export LANG=C",
+        "export LC_ALL=C",
+        "lualatex --version",
+        "pdflatex --version",
+        "tlmgr info --only-installed scheme-basic",
+        'echo "\\\\documentclass{article}\\\\begin{document}LuaLaTeX works.\\\\end{document}" > smoke.tex',
+        "lualatex -interaction=nonstopmode -halt-on-error smoke.tex",
+        "test -s smoke.pdf",
+        'echo "\\\\documentclass{article}\\\\usepackage{times}\\\\begin{document}Times and \\\\texttt{Courier}.\\\\end{document}" > fonts.tex',
+        "pdflatex -interaction=nonstopmode -halt-on-error fonts.tex",
+        "test -s fonts.pdf",
+    ]
+    if kind == "basic":
+        commands.insert(5, "tlmgr info --only-installed collection-fontsrecommended")
+    elif kind == "standard":
+        commands.insert(5, "tlmgr info --only-installed scheme-small")
+        commands.extend(
+            [
+                "xelatex --version",
+                'echo "\\\\documentclass{article}\\\\usepackage{booktabs,microtype,xcolor}\\\\begin{document}Standard profile.\\\\end{document}" > standard.tex',
+                "latexmk -pdf -interaction=nonstopmode -halt-on-error standard.tex",
+                "test -s standard.pdf",
+                'echo "\\\\documentclass{article}\\\\begin{document}XeLaTeX works.\\\\end{document}" > xetex.tex',
+                "xelatex -interaction=nonstopmode -halt-on-error xetex.tex",
+                "test -s xetex.pdf",
+            ]
+        )
+    else:
+        raise ValueError(f"unknown test kind: {kind}")
+    return commands
+
+
+def yaml_script(commands: list[str]) -> str:
+    return "\n".join(f"      - {command}" for command in commands)
+
+
+def generate(profile_name: str, profile: dict[str, Any], output: pathlib.Path) -> None:
     tlpdb_raw = fetch(f"{TLNET}/tlpkg/texlive.tlpdb")
     records = parse_tlpdb(tlpdb_raw)
-    packages = sorted(
-        set().union(*(dependency_closure(records, root) for root in root_packages))
-    )
+    roots = profile["roots"]
+    packages = sorted(set().union(*(dependency_closure(records, root) for root in roots)))
 
-    # Date the generated package after the repository snapshot and retain every
-    # upstream revision in the lock file for reviewability.
     version = dt.datetime.now(dt.UTC).strftime("%Y%m%d")
     with concurrent.futures.ThreadPoolExecutor(max_workers=12) as executor:
         hashes = dict(executor.map(package_hash, packages))
 
     output.mkdir(parents=True, exist_ok=True)
-    lock = output / "packages.lock"
-    lock.write_text(
+    (output / "packages.lock").write_text(
         "# package revision sha256\n"
         + "".join(
             f"{name} {records[name].get('revision', ['0'])[0]} {hashes[name]}\n"
@@ -95,6 +132,13 @@ def generate(root_packages: list[str], output: pathlib.Path) -> None:
             ]
         )
 
+    constraints = ""
+    if profile.get("conflicts"):
+        constraints = "  run_constraints:\n" + "".join(
+            f"    - {name} <0a0\n" for name in profile["conflicts"]
+        )
+
+    description = "\n".join(f"    {line}" for line in profile["description"].strip().splitlines())
     recipe = f'''schema_version: 1
 
 context:
@@ -102,14 +146,14 @@ context:
   texlive_version: "20260301"
 
 package:
-  name: texlive-basic
+  name: {profile["package"]}
   version: ${{{{ version }}}}
 
 source:
 {chr(10).join(source_lines)}
 
 build:
-  number: 2
+  number: {profile["build_number"]}
   script: build.sh
 
 requirements:
@@ -119,53 +163,38 @@ requirements:
     - texlive-core ==${{{{ texlive_version }}}}
   run:
     - texlive-core ==${{{{ texlive_version }}}}
-
- tests:
+{constraints}
+tests:
   - script:
-      - export LANG=C
-      - export LC_ALL=C
-      - lualatex --version
-      - pdflatex --version
-      - tlmgr info --only-installed scheme-basic
-      - tlmgr info --only-installed collection-fontsrecommended
-      - echo "\\\\documentclass{{article}}\\\\begin{{document}}LuaLaTeX works.\\\\end{{document}}" > smoke.tex
-      - lualatex -interaction=nonstopmode -halt-on-error smoke.tex
-      - test -s smoke.pdf
-      - echo "\\\\documentclass{{article}}\\\\usepackage{{times}}\\\\begin{{document}}Times and \\\\texttt{{Courier}}.\\\\end{{document}}" > fonts.tex
-      - pdflatex -interaction=nonstopmode -halt-on-error fonts.tex
-      - test -s fonts.pdf
+{yaml_script(test_commands(profile["test_kind"]))}
 
 about:
   homepage: https://www.tug.org/texlive/
   license: GPL-2.0-or-later AND LPPL-1.3c AND OFL-1.1
-  summary: TeX Live basic scheme with recommended fonts
+  summary: {profile["summary"]}
   description: |
-    The transitive contents of TeX Live's scheme-basic and recommended font
-    collection, locked from the tlnet package database. It adds the macro files,
-    fonts, configuration, and formats needed for a functional TeX installation
-    to texlive-core.
+{description}
 
 extra:
   recipe-maintainers:
     - wolfv
-  texlive-root-packages: {' '.join(root_packages)}
+  texlive-profile: {profile_name}
+  texlive-root-packages: {' '.join(roots)}
 '''
-    # Keep generated YAML syntactically aligned despite the readable template.
-    recipe = recipe.replace("\n tests:\n", "\ntests:\n")
     (output / "recipe.yaml").write_text(recipe)
     print(f"Generated {output / 'recipe.yaml'} with {len(packages)} archives")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--root",
-        nargs="+",
-        default=["scheme-basic", "collection-fontsrecommended"],
-    )
-    parser.add_argument("--output", type=pathlib.Path, default=ROOT / "texlive-basic")
+    parser.add_argument("--profile", choices=("basic", "standard"), default="basic")
+    parser.add_argument("--output", type=pathlib.Path)
     args = parser.parse_args()
-    generate(args.root, args.output)
+
+    profiles = tomllib.loads(PROFILES.read_text())["profiles"]
+    profile = profiles[args.profile]
+    output = args.output or ROOT / profile["package"]
+    generate(args.profile, profile, output)
 
 
 if __name__ == "__main__":

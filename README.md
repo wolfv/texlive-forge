@@ -12,12 +12,15 @@ conda-forge recipes.
   files, recommended fonts, generated font maps and formats, and a working
   `tlmgr` package database. It provides tested `latex`, `pdflatex`, `bibtex`,
   and `lualatex` commands.
-- `texlive`: a convenience metapackage for installing `texlive-basic` with
+- `texlive-standard`: the locked `scheme-small` profile (391 tlnet archives),
+  including commonly expected LaTeX packages, recommended fonts, graphics,
+  bibliography support, and `latexmk`.
+- `texlive`: a convenience metapackage for installing `texlive-standard` with
   `pixi add texlive`.
 - `texmaker`: the current Qt 6 LaTeX editor for Linux and macOS,
   updated from [conda-forge/texmaker-feedstock](https://github.com/conda-forge/texmaker-feedstock).
   It includes menuinst shortcuts and TeX file associations on both platforms;
-  Unix packages depend on this repository's functional `texlive-basic` package.
+  Unix packages depend on this repository's functional `texlive-standard` profile.
 
 ## Local build
 
@@ -26,6 +29,7 @@ Install [pixi](https://pixi.sh), then run:
 ```bash
 pixi run build-core
 pixi run build-basic
+pixi run build-standard
 pixi run build-texlive
 # On Unix, the TeX packages must finish before the editor.
 pixi run build-texmaker

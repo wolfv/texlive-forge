@@ -468,6 +468,8 @@ requirements:
     - texlive-core ==${{ texlive_version }}
   run:
     - texlive-core ==${{ texlive_version }}
+  run_constraints:
+    - texlive-standard <0a0
 
 tests:
   - script:
@@ -490,11 +492,11 @@ about:
   summary: TeX Live basic scheme with recommended fonts
   description: |
     The transitive contents of TeX Live's scheme-basic and recommended font
-    collection, locked from the tlnet package database. It adds the macro files,
-    fonts, configuration, and formats needed for a functional TeX installation
-    to texlive-core.
+    collection, locked from the tlnet package database. It provides a compact,
+    functional LaTeX, PDFLaTeX, and LuaLaTeX installation.
 
 extra:
   recipe-maintainers:
     - wolfv
+  texlive-profile: basic
   texlive-root-packages: scheme-basic collection-fontsrecommended

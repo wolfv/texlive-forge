@@ -44,6 +44,10 @@ jobs:
         if: matrix.build_core
         run: pixi run build-basic
 
+      - name: Build the standard TeX profile
+        if: matrix.build_core
+        run: pixi run build-standard
+
       - name: Build texlive convenience package
         if: matrix.build_meta
         run: pixi run build-texlive
